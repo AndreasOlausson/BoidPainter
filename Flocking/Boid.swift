@@ -60,7 +60,7 @@ struct PositionHistory {
 }
 struct BoidsConfig {
     var numberOfBoids = 150
-    var numberOfPredators = 1
+    var numberOfPredators = 3
     var speedFactor: CGFloat = 1.0
 
     var maxSpeed: CGFloat
