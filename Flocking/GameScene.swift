@@ -4,7 +4,29 @@ import GameplayKit
 class GameScene: SKScene {
     
     // Layers (nodes)
-    var boidsLayer = SKNode() // Ändra till SKNode för enklare hantering
+    var boidsLayer = SKSpriteNode() // Ändra till SKNode för enklare hantering
+    var backgroundLayer = SKSpriteNode()
+    var imageLayer = SKSpriteNode()
+    var artBackLayer = SKSpriteNode()
+    var artLayer = SKSpriteNode()
+    var settingsLayer = SKSpriteNode()
+       
+
+    var canvasTexture: SKTexture?
+    var canvasSprite: SKSpriteNode?
+    var canvasContext: CGContext?
+    var canvasImageView: UIImageView?
+
+    func setupCanvasImageView() {
+        let canvasSize = CGSize(width: screenWidth, height: screenHeight)
+        canvasImageView = UIImageView(frame: CGRect(origin: .zero, size: canvasSize))
+        canvasImageView?.backgroundColor = .clear
+
+        if let view = self.view, let canvas = canvasImageView {
+            view.addSubview(canvas)
+        }
+    }
+    
     var screenWidth: CGFloat = 0
     var screenHeight: CGFloat = 0
     
@@ -14,9 +36,17 @@ class GameScene: SKScene {
     
     // Timer för att köra simuleringen
     var simulationTimer: Timer?
+    var isPlaying: Bool = false // Default = don't fly
     
     // boidConfig
     var config = BoidsConfig()
+    
+    
+    //Image stuff
+    var iterationCount = 0
+    var collectedCurves: [ArtCurves] = []
+    let brushManager = BrushManager()
+
     
     override func didMove(to view: SKView) {
         // Sätt scenens storlek till vyens storlek
@@ -34,23 +64,88 @@ class GameScene: SKScene {
             screenHeight = view.frame.size.height
         }
         
-        print("Scene Size: \(self.size.width), \(self.size.height)")
-        print("View Frame: \(view.frame.size.width), \(view.frame.size.height)")
-        
         setUpLayers()
+        initializeCanvas()
+        setupCanvasImageView()
+        initializeCanvasImageView()
         generateBoidsAndPredators()
         
         // Starta simuleringen
-        startSimulation()
+        //startSimulation()
     }
     
     private func setUpLayers() {
+        
+        boidsLayer.size = CGSize(width: screenWidth, height: screenHeight)
+        backgroundLayer.size = CGSize(width: screenWidth, height: screenHeight)
+        imageLayer.size = CGSize(width: screenWidth, height: screenHeight)
+        artBackLayer.size = CGSize(width: screenWidth, height: screenHeight)
+        artLayer.size = CGSize(width: screenWidth, height: screenHeight)
+        settingsLayer.size = CGSize(width: screenWidth, height: screenHeight)
+        
+        
         // Placera `boidsLayer` i origo
         boidsLayer.position = CGPoint(x: 0, y: 0)
+        backgroundLayer.position = CGPoint(x: 0, y: 0)
+        imageLayer.position = CGPoint(x: 0, y: 0)
+        artBackLayer.position = CGPoint(x: 0, y: 0)
+        //artLayer.position = CGPoint(x: (screenWidth / 2), y: (screenHeight / 2))
+        artLayer.position = CGPoint(x: 0, y: 0)
+
+        
+        settingsLayer.position = CGPoint(x: 0, y: 0)
+        
+        // z-index
+        backgroundLayer.zPosition = 0
+        imageLayer.zPosition = 1
+        artBackLayer.zPosition = 2
+        artLayer.zPosition = 3
+        boidsLayer.zPosition = 4
+        settingsLayer.zPosition = 5
+        
         // Lägg till boidsLayer till scenen
+        self.addChild(backgroundLayer)
+        self.addChild(imageLayer)
+        self.addChild(artBackLayer)
+        self.addChild(artLayer)
         self.addChild(boidsLayer)
+        self.addChild(settingsLayer)
+    }
+    func initializeCanvas() {
+        let canvasSize = CGSize(width: screenWidth, height: screenHeight)
+        
+        // Skapa en ny context och fyll den med en tom bakgrund
+        UIGraphicsBeginImageContextWithOptions(canvasSize, false, 0.0)
+        if let context = UIGraphicsGetCurrentContext() {
+            context.setFillColor(UIColor.clear.cgColor)
+            context.fill(CGRect(origin: .zero, size: canvasSize))
+        }
+        
+        // Skapa en initial tom bild från canvasen
+        if let initialImage = UIGraphicsGetImageFromCurrentImageContext() {
+            canvasTexture = SKTexture(image: initialImage)
+        }
+        
+        UIGraphicsEndImageContext()
+        
+        // Lägg till canvasSprite på scenen
+        let sprite = SKSpriteNode(texture: canvasTexture)
+        sprite.position = CGPoint(x: screenWidth / 2, y: screenHeight / 2)
+        sprite.size = canvasSize
+        sprite.zPosition = 1
+        artLayer.addChild(sprite)
+        canvasSprite = sprite
     }
     
+    public func toggleBoidMovement() {
+        if isPlaying {
+            stopSimulation()
+        } else {
+            startSimulation()
+        }
+        isPlaying.toggle() // Växla mellan play/pause
+    }
+
     // Funktion för att generera 20 boids och 2 predatorer
     func generateBoidsAndPredators() {
         let numberOfBoids = self.config.numberOfBoids
@@ -85,6 +180,10 @@ class GameScene: SKScene {
     func startSimulation() {
         simulationTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(runSimulation), userInfo: nil, repeats: true)
     }
+    func stopSimulation() {
+        simulationTimer?.invalidate()
+        simulationTimer = nil
+    }
     
     // Funktion för att köra simuleringen
     @objc func runSimulation() {
@@ -100,6 +199,28 @@ class GameScene: SKScene {
         for (index, boid) in boids.enumerated() {
             if let boidNode = boidsLayer.children[index] as? SKShapeNode {
                 boidNode.position = CGPoint(x: boid.position.x, y: boid.position.y)
+                
+                var positionColor: UIColor? = .clear
+                positionColor = getPixelColor(at: boid.position.toCGPoint())
+
+                if let color = positionColor, let components = color.getRGBAComponents() {
+                    boid.coloredPositionHistory.append(ColoredPoint(position: CGPoint(x: boid.position.x, y: boid.position.y), red: components.red, green: components.green, blue: components.blue))
+                }
+                
+                // Begränsa storleken på historiken till de senaste 10 punkterna
+                if boid.coloredPositionHistory.count > 5 {
+                    boid.coloredPositionHistory.removeFirst()
+                }
+                
+                //drawNaturalCurve(for: boid, color: positionColor ?? .clear)
+                //collectCurves(for: boid)
+                //drawAndDisplayCollectedCurves()
+                if(config.doPaint) {
+                    drawNaturalCurveOnCanvas(for: boid, color: positionColor ?? .clear)
+                }
+                
+                
+                
                 
                 // Beräkna vinkeln för rotation baserat på hastigheten
                 let angle = atan2(boid.velocity.y, boid.velocity.x) - CGFloat.pi / 2
@@ -270,5 +391,438 @@ class GameScene: SKScene {
         }
         
         return boidNode
+    }
+    
+    
+    
+    
+    
+    func addImage(_ image: UIImage) {
+        // Hämta skärmens storlek
+        let screenWidth = self.size.width
+        let screenHeight = self.size.height
+        
+        // Bildens ursprungliga storlek
+        let imageSize = image.size
+        
+        // Beräkna skalfaktorn för att täcka hela skärmen
+        let widthScale = screenWidth / imageSize.width
+        let heightScale = screenHeight / imageSize.height
+        let scale = max(widthScale, heightScale) // Välj den större skalan för att täcka hela skärmen
+        
+        // Beräkna den nya storleken baserat på skalan
+        let newWidth = imageSize.width * scale
+        let newHeight = imageSize.height * scale
+        
+        // Skapa en SKSpriteNode med den nya storleken
+        let texture = SKTexture(image: image)
+        let sprite = SKSpriteNode(texture: texture)
+        sprite.size = CGSize(width: newWidth, height: newHeight)
+        
+        // Centrera bilden på skärmen
+        sprite.position = CGPoint(x: screenWidth / 2, y: screenHeight / 2)
+        
+        // Sätt anchorPoint för att centrera bilden korrekt
+        sprite.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        
+        // Lägg till spriteNode till scenen
+        imageLayer.addChild(sprite)
+        
+        // Lägg till cache här
+        let cacheKey = "myImage"
+        ImageCache.shared.storeImage(image, forKey: cacheKey)
+        
+    }
+    
+    
+    
+    
+    
+    
+    //Image handling
+    func getPixelColor(at position: CGPoint) -> UIColor? {
+        // Hämta bilden från cachen
+        guard let cachedImage = ImageCache.shared.image(forKey: "myImage") else { return nil }
+        
+        // Bildens storlek
+        let imageSize = cachedImage.size
+        let imageWidth = imageSize.width
+        let imageHeight = imageSize.height
+        
+        // Justera positionen för att matcha bildens koordinatsystem (om det behövs)
+        let adjustedYPosition = imageHeight - position.y
+        
+        // Beräkna positionen i bildens koordinatsystem
+        let adjustedPosition = CGPoint(x: position.x, y: adjustedYPosition)
+        
+        // Använd pixelColor-funktionen för att hämta färgen
+        return pixelColor(atPoint: adjustedPosition, inImage: cachedImage)
+    }
+    func pixelColor(atPoint point: CGPoint, inImage image: UIImage) -> UIColor? {
+        guard let cgImage = image.cgImage else { return nil }
+        
+        let width = cgImage.width
+        let height = cgImage.height
+        
+        
+        // Kontrollera att punkten är inom bilden
+        guard point.x >= 0 && point.x < CGFloat(width), point.y >= 0 && point.y < CGFloat(height) else { return nil }
+        
+        // Räkna ut indexet i pixeldata
+        let offset = 4 * ((width * Int(point.y)) + Int(point.x))
+        let data = cgImage.dataProvider!.data
+        let dataPtr: UnsafePointer<UInt8> = CFDataGetBytePtr(data)
+        
+        // Hämta RGBA-värden
+        let red = CGFloat(dataPtr[offset]) / 255.0
+        let green = CGFloat(dataPtr[offset + 1]) / 255.0
+        let blue = CGFloat(dataPtr[offset + 2]) / 255.0
+        alpha = CGFloat(dataPtr[offset + 3]) / 255.0
+        
+        return UIColor(red: red, green: green, blue: blue, alpha: alpha)
+    }
+    func drawNaturalCurve(for boid: Boid, color: UIColor = .clear) {
+        // Öka iterationCount för varje ny kurva
+        iterationCount += 1
+        let history = boid.coloredPositionHistory
+        
+        // Kolla att vi har minst 4 punkter
+        guard history.count >= 4 else { return }
+        
+        let path = UIBezierPath()
+        
+        // Starta från den tredje senaste punkten (en bit bak i historiken)
+        path.move(to: history[history.count - 3].position)
+        
+        // Lägg till en Bezier-kurva med kontrollpunkter och slutpunkt
+        let controlPoint1 = history[history.count - 2]
+        let controlPoint2 = history[history.count - 1]
+        let endPoint = boid.position // Boidens nuvarande position
+        
+        path.addCurve(to: endPoint.toCGPoint(), controlPoint1: controlPoint1.position, controlPoint2: controlPoint2.position)
+        
+        // Skapa en SKShapeNode för kurvan
+        let curve = SKShapeNode(path: path.cgPath)
+        
+        // Sätt kurvans färg till samma som bakgrunden
+        curve.strokeColor = color.withAlphaComponent(0.5)
+        curve.lineWidth = 5
+        curve.glowWidth = 2
+        curve.isAntialiased = true
+        
+        // Lägg till kurvan till artNode
+        //artLayer.addChild(curve)
+    }
+    func collectCurves(for boid: Boid) {
+        // Kontrollera att det finns minst 4 punkter i historiken
+        guard boid.coloredPositionHistory.count >= 4 else { return }
+        
+        // Hämta de 4 sista punkterna från historiken
+        let lastFourPoints = boid.coloredPositionHistory.suffix(4)
+        
+        // Skapa en UIBezierPath
+        let path = UIBezierPath()
+        
+        // Starta kurvan vid den första punkten
+        if let firstPoint = lastFourPoints.first {
+            path.move(to: firstPoint.position)
+        }
+        
+        // Använd de återstående punkterna för att skapa en Bézier-kurva
+        if lastFourPoints.count >= 4 {
+            let points = Array(lastFourPoints)
+            
+            // Skapa Bézier-kurvan med fyra punkter
+            path.addCurve(
+                to: points[3].position,
+                controlPoint1: points[1].position,
+                controlPoint2: points[2].position
+            )
+        }
+        
+        // Flippa kurvan vertikalt för att matcha SpriteKit's koordinatsystem
+        let imageSize = self.size
+        let flippedPath = flipVertical(for: path, imageSize: imageSize)
+        
+        // Hämta färgen från den senaste punkten
+        if let lastColoredPoint = lastFourPoints.last {
+            let red = CGFloat(lastColoredPoint.red)
+            let green = CGFloat(lastColoredPoint.green)
+            let blue = CGFloat(lastColoredPoint.blue)
+            let color = UIColor(red: red, green: green, blue: blue, alpha: 0.5)
+            
+            // Skapa en ArtCurves-instans med den flippade kurvan och färgen
+            let brush = BrushManager().getBrush(for: Float(iterationCount))
+            
+            let curve = ArtCurves(path: flippedPath, color: color, brush: brush)
+            collectedCurves.append(curve)
+        }
+    }
+
+    func flipVertical(for path: UIBezierPath, imageSize: CGSize) -> UIBezierPath {
+        let flippedPath = UIBezierPath()
+
+        // Iterera genom alla element i originalvägen
+        path.cgPath.applyWithBlock { elementPointer in
+            let element = elementPointer.pointee
+            var points = [CGPoint](repeating: .zero, count: 3)
+
+            switch element.type {
+            case .moveToPoint:
+                points[0] = element.points[0]
+                points[0].y = imageSize.height - points[0].y // Invertera y-koordinaten
+                flippedPath.move(to: points[0])
+                
+            case .addLineToPoint:
+                points[0] = element.points[0]
+                points[0].y = imageSize.height - points[0].y // Invertera y-koordinaten
+                flippedPath.addLine(to: points[0])
+                
+            case .addQuadCurveToPoint:
+                points[0] = element.points[0]
+                points[1] = element.points[1]
+                points[0].y = imageSize.height - points[0].y // Invertera y-koordinaterna
+                points[1].y = imageSize.height - points[1].y
+                flippedPath.addQuadCurve(to: points[0], controlPoint: points[1])
+                
+            case .addCurveToPoint:
+                points[0] = element.points[0]
+                points[1] = element.points[1]
+                points[2] = element.points[2]
+                points[0].y = imageSize.height - points[0].y // Invertera y-koordinaterna
+                points[1].y = imageSize.height - points[1].y
+                points[2].y = imageSize.height - points[2].y
+                flippedPath.addCurve(to: points[0], controlPoint1: points[1], controlPoint2: points[2])
+                
+            case .closeSubpath:
+                flippedPath.close()
+                
+            @unknown default:
+                break
+            }
+        }
+
+        return flippedPath
+    }
+    
+    func drawAndDisplayCollectedCurves2() {
+        // Skapa en textur från samlade kurvor
+        let texture = mergeCurvesIntoTexture(curves: collectedCurves)
+        
+        // Skapa en nod med texturen
+        let combinedNode = SKSpriteNode(texture: texture)
+        
+        // Lägg till den på scenen, exempelvis i artBackNode
+        artBackLayer.addChild(combinedNode)
+        
+        // Rensa gamla noder om nödvändigt
+        artLayer.removeAllChildren()
+        
+        // Töm arrayen med samlade kurvor
+        collectedCurves.removeAll()
+    }
+    func drawAndDisplayCollectedCurves() {
+        // Instead of merging into a texture, use SKShapeNode for each curve
+        for curve in collectedCurves {
+            let curveNode = SKShapeNode(path: curve.path.cgPath)
+            curveNode.strokeColor = curve.color
+            curveNode.lineWidth = curve.brush.strokeSize
+            curveNode.alpha = curve.brush.opacity
+            curveNode.isAntialiased = curve.brush.antiAliasing
+            artBackLayer.addChild(curveNode)
+        }
+        
+        // Clear the collected curves to avoid rendering them again
+        collectedCurves.removeAll()
+        
+        // Optionally, you can control the number of nodes to avoid excessive drawing
+        while artBackLayer.children.count > 100 {
+            artBackLayer.children[0].removeFromParent() // Remove the oldest nodes if necessary
+        }
+    }
+
+    func mergeCurvesIntoTexture(curves: [ArtCurves]) -> SKTexture {
+        let size = CGSize(width: artBackLayer.frame.width, height: artBackLayer.frame.height) // Anpassa storleken efter ditt behov
+        UIGraphicsBeginImageContextWithOptions(size, false, 0.0) // Anti-aliasing och högre upplösning
+        
+        for curve in curves {
+            let brush = curve.brush
+            
+            // Applicera penselns egenskaper på kurvan
+            curve.path.lineWidth = brush.strokeSize // Sätt linjebredd direkt på path
+            
+            // Ställ in färg och opacitet för stroke
+            let strokeColor = curve.color.withAlphaComponent(brush.opacity)
+            strokeColor.setStroke()
+            
+            // Rita kurvan
+            curve.path.stroke()
+        }
+        
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return SKTexture(image: image!)
+    }
+    func drawNaturalCurveOnCanvas_old(for boid: Boid, color: UIColor = .clear) {
+        guard let canvasImageView = canvasImageView else {
+            return
+        }
+
+        // Get the brush based on iteration count
+        let brush = brushManager.getBrush(for: Float(iterationCount))
+        iterationCount += 1
+
+        // Get the current image of the canvas
+        let size = canvasImageView.frame.size
+        UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
+        guard let context = UIGraphicsGetCurrentContext() else {
+            UIGraphicsEndImageContext()
+            return
+        }
+
+        // Draw the existing image onto the context
+        canvasImageView.image?.draw(in: CGRect(origin: .zero, size: size))
+
+        // Get the boid's position history
+        let history = boid.coloredPositionHistory
+        guard history.count >= 4 else {
+            UIGraphicsEndImageContext()
+            return
+        }
+
+        // Draw the new curve
+        let path = UIBezierPath()
+        path.move(to: history[history.count - 3].position)
+        let controlPoint1 = history[history.count - 2]
+        let controlPoint2 = history[history.count - 1]
+        let endPoint = boid.position
+
+        path.addCurve(to: endPoint.toCGPoint(), controlPoint1: controlPoint1.position, controlPoint2: controlPoint2.position)
+
+        // Apply anti-aliasing if required
+        context.setAllowsAntialiasing(brush.antiAliasing)
+        context.setShouldAntialias(brush.antiAliasing)
+
+        // Draw the glow effect if glowSize > 0
+        if brush.glowSize > 0 {
+            for i in 1...Int(brush.glowSize) {
+                let glowColor = color.withAlphaComponent(brush.opacity / CGFloat(i + 1))
+                glowColor.setStroke()
+                path.lineWidth = brush.strokeSize + CGFloat(i)
+                path.stroke()
+            }
+        }
+
+        // Draw the main path with the specified brush properties
+        color.withAlphaComponent(brush.opacity).setStroke()
+        path.lineWidth = brush.strokeSize
+        path.stroke()
+
+        // Get the new image and assign it to the canvas image view
+        if let newImage = UIGraphicsGetImageFromCurrentImageContext() {
+            canvasImageView.image = newImage
+        }
+
+        // End the image context
+        UIGraphicsEndImageContext()
+    }
+    func drawNaturalCurveOnCanvas(for boid: Boid, color: UIColor = .clear) {
+        
+        guard let canvasImageView = canvasImageView else {
+            print("Canvas image view is nil")
+            return
+        }
+
+        // Get the current canvas image
+        guard let currentImage = canvasImageView.image else {
+            print("Current canvas image is nil, should not happen after initialization")
+            return
+        }
+        // Get the brush based on iteration count
+            let brush = brushManager.getBrush(for: Float(iterationCount))
+        iterationCount += 1
+        
+
+        // Set up the drawing context
+        let size = canvasImageView.frame.size
+        UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
+
+        // Draw the existing image onto the context
+        currentImage.draw(in: CGRect(origin: .zero, size: size))
+
+        // Get the boid's position history
+        let history = boid.coloredPositionHistory
+        guard history.count >= 4 else {
+            print("Insufficient position history for drawing. History count: \(history.count)")
+            UIGraphicsEndImageContext()
+            return
+        }
+        //ny
+        guard let context = UIGraphicsGetCurrentContext() else {
+            UIGraphicsEndImageContext()
+            return
+        }
+        
+        // Create a new path for the curve
+        let path = UIBezierPath()
+        let startPoint = CGPoint(x: history[history.count - 3].position.x, y: size.height - history[history.count - 3].position.y)
+        path.move(to: startPoint)
+
+        let controlPoint1 = CGPoint(x: history[history.count - 2].position.x, y: size.height - history[history.count - 2].position.y)
+        let controlPoint2 = CGPoint(x: history[history.count - 1].position.x, y: size.height - history[history.count - 1].position.y)
+        let endPoint = CGPoint(x: boid.position.x, y: size.height - boid.position.y)
+
+        path.addCurve(to: endPoint, controlPoint1: controlPoint1, controlPoint2: controlPoint2)
+        
+        //ny
+        // Apply anti-aliasing if required
+        context.setAllowsAntialiasing(brush.antiAliasing)
+        context.setShouldAntialias(brush.antiAliasing)
+        
+        // Draw the glow effect if glowSize > 0
+        if brush.glowSize > 0 {
+            for i in 1...Int(brush.glowSize) {
+                let glowColor = color.withAlphaComponent(brush.opacity / CGFloat(i + 1))
+                glowColor.setStroke()
+                path.lineWidth = brush.strokeSize + CGFloat(i)
+                path.stroke()
+            }
+        }
+        
+        
+
+        // Set path properties and draw the stroke
+        color.withAlphaComponent(brush.opacity).setStroke()
+        path.lineWidth = brush.strokeSize
+        path.stroke()
+
+        // Get the updated image and set it back to the canvas
+        if let newImage = UIGraphicsGetImageFromCurrentImageContext() {
+            canvasImageView.image = newImage
+        } else {
+            print("Failed to get new image from current context")
+        }
+
+        // End the image context
+        UIGraphicsEndImageContext()
+    }
+    func initializeCanvasImageView() {
+        guard let canvasImageView = canvasImageView else {
+            return
+        }
+
+        let size = canvasImageView.frame.size
+        UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
+        UIColor.clear.setFill()  // Set the initial image to be transparent
+        UIRectFill(CGRect(origin: .zero, size: size))  // Fill the context with the clear color
+
+        if let initialImage = UIGraphicsGetImageFromCurrentImageContext() {
+            canvasImageView.image = initialImage
+        } else {
+            print("Failed to create initial canvas image")
+        }
+
+        UIGraphicsEndImageContext()
     }
 }

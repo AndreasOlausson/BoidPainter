@@ -52,16 +52,25 @@ struct Vector3 {
     func distance(to vector: Vector3) -> CGFloat {
         return (self - vector).magnitude()
     }
+    func toCGPoint() -> CGPoint {
+            return CGPoint(x: self.x, y: self.y)
+        }
 }
-
+struct ColoredPoint {
+    var position: CGPoint
+    var red: CGFloat
+    var green: CGFloat
+    var blue: CGFloat
+}
 struct PositionHistory {
     var position: Vector3
     var color: SKColor
 }
 struct BoidsConfig {
-    var numberOfBoids = 150
+    var numberOfBoids = 600
     var numberOfPredators = 3
     var speedFactor: CGFloat = 1.0
+    var doPaint: Bool = true
 
     var maxSpeed: CGFloat
     var avoidanceRange: CGFloat
@@ -100,9 +109,6 @@ struct BoidsConfig {
 
     init(speedFactor: CGFloat = 1.0) {
         self.speedFactor = speedFactor
-        
-        print(speedFactor)
-        print(self.speedFactor)
 
         // Använd speedFactor för att justera hastighetsrelaterade parametrar
         self.maxSpeed = 4.0 * speedFactor
@@ -146,6 +152,7 @@ class Boid {
     var position: Vector3
     var velocity: Vector3
     var positionHistory: [PositionHistory] = []
+    var coloredPositionHistory: [ColoredPoint] = []
 
     init(position: Vector3, velocity: Vector3) {
         self.position = position

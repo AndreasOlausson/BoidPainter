@@ -14,7 +14,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        self.window = UIWindow(frame: UIScreen.main.bounds)
+        
+        // Visa launchscreen
+        let launchScreenVC = UIStoryboard(name: "LaunchScreen", bundle: nil).instantiateInitialViewController()
+        self.window?.rootViewController = launchScreenVC
+        self.window?.makeKeyAndVisible()
+
+        // Växla till main storyboard efter 5 sekunder
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            let mainVC = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController()
+            self.window?.rootViewController = mainVC
+        }
+
         return true
     }
 
