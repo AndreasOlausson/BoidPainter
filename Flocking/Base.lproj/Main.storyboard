@@ -99,7 +99,7 @@
                                     <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SXS-v1-8Xl">
                                         <rect key="frame" x="160" y="116" width="49" height="31"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <accessibility key="accessibilityConfiguration" identifier="showBoidsSwitch"/>
+                                        <accessibility key="accessibilityConfiguration" identifier="showArtSwitch"/>
                                         <connections>
                                             <action selector="showArtSwitchChanged:" destination="BV1-FR-VrT" eventType="valueChanged" id="ovB-37-Vd3"/>
                                         </connections>
@@ -107,30 +107,42 @@
                                     <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Yau-DQ-NBY">
                                         <rect key="frame" x="297" y="116" width="49" height="31"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <accessibility key="accessibilityConfiguration" identifier="showBoidsSwitch"/>
+                                        <accessibility key="accessibilityConfiguration" identifier="showImageSwitch"/>
                                         <connections>
                                             <action selector="showImageSwitchChanged:" destination="BV1-FR-VrT" eventType="valueChanged" id="Rfe-Vk-T3i"/>
                                         </connections>
                                     </switch>
                                     <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xYc-Gd-Cte">
-                                        <rect key="frame" x="299" y="246" width="49" height="31"/>
+                                        <rect key="frame" x="97" y="329" width="49" height="31"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <accessibility key="accessibilityConfiguration" identifier="showBoidsSwitch"/>
+                                        <accessibility key="accessibilityConfiguration" identifier="FleePerceptionRingSwitch"/>
+                                        <connections>
+                                            <action selector="showFleePerceptionRingSwitchChanged:" destination="BV1-FR-VrT" eventType="valueChanged" id="lMJ-an-Rn9"/>
+                                        </connections>
                                     </switch>
                                     <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NYL-aF-AeD">
-                                        <rect key="frame" x="206" y="246" width="49" height="31"/>
+                                        <rect key="frame" x="97" y="290" width="49" height="31"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <accessibility key="accessibilityConfiguration" identifier="showBoidsSwitch"/>
+                                        <accessibility key="accessibilityConfiguration" identifier="CohesionPerceptionRingSwitch"/>
+                                        <connections>
+                                            <action selector="showCohesionPerceptionRingSwitchChanged:" destination="BV1-FR-VrT" eventType="valueChanged" id="gR9-Ja-y3U"/>
+                                        </connections>
                                     </switch>
                                     <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uPt-i6-e4k">
-                                        <rect key="frame" x="107" y="246" width="49" height="31"/>
+                                        <rect key="frame" x="97" y="251" width="49" height="31"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <accessibility key="accessibilityConfiguration" identifier="showBoidsSwitch"/>
+                                        <accessibility key="accessibilityConfiguration" identifier="AlignmentPerceptionRingSwitch"/>
+                                        <connections>
+                                            <action selector="showAlignmentPerceptionRingSwitchChanged:" destination="BV1-FR-VrT" eventType="valueChanged" id="Z8J-Qg-NkZ"/>
+                                        </connections>
                                     </switch>
                                     <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FC7-rj-cOn">
-                                        <rect key="frame" x="10" y="246" width="49" height="31"/>
+                                        <rect key="frame" x="97" y="208" width="49" height="31"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <accessibility key="accessibilityConfiguration" identifier="showBoidsSwitch"/>
+                                        <accessibility key="accessibilityConfiguration" identifier="AvoidancePerceptionRingSwitch"/>
+                                        <connections>
+                                            <action selector="showAvoidancePerceptionRingSwitchChanged:" destination="BV1-FR-VrT" eventType="valueChanged" id="z9f-Tg-bZb"/>
+                                        </connections>
                                     </switch>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Avoidance" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ctY-Qg-vpi">
                                         <rect key="frame" x="10" y="213" width="79" height="21"/>
@@ -140,59 +152,95 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Alignment" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qYG-n3-a4N">
-                                        <rect key="frame" x="98" y="213" width="77" height="21"/>
+                                        <rect key="frame" x="10" y="256" width="77" height="21"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Cohesion" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6IY-He-Z60">
-                                        <rect key="frame" x="206" y="213" width="72" height="21"/>
+                                        <rect key="frame" x="8" y="295" width="72" height="21"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Predators" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bA3-5L-kXa">
-                                        <rect key="frame" x="8" y="285" width="74" height="21"/>
+                                        <rect key="frame" x="272" y="184" width="74" height="21"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sE3-9C-pBc">
-                                        <rect key="frame" x="160" y="347" width="49" height="31"/>
+                                        <rect key="frame" x="195" y="251" width="49" height="31"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <accessibility key="accessibilityConfiguration" identifier="showBoidsSwitch"/>
+                                        <accessibility key="accessibilityConfiguration" identifier="PredatorHuntingRangePerceptionRingSwitch"/>
+                                        <connections>
+                                            <action selector="showPredatorHuntingRangePerceptionRingSwitchChanged:" destination="BV1-FR-VrT" eventType="valueChanged" id="K2M-jl-SdN"/>
+                                        </connections>
                                     </switch>
                                     <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8IP-4O-Bbg">
-                                        <rect key="frame" x="8" y="347" width="49" height="31"/>
+                                        <rect key="frame" x="195" y="208" width="49" height="31"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <accessibility key="accessibilityConfiguration" identifier="showBoidsSwitch"/>
+                                        <accessibility key="accessibilityConfiguration" identifier="PredatorVisualRangePerceptionRingSwitch"/>
+                                        <connections>
+                                            <action selector="showPredatorVisualRangePerceptionRingSwitchChanged:" destination="BV1-FR-VrT" eventType="valueChanged" id="PVm-g0-oDv"/>
+                                        </connections>
                                     </switch>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Visual range" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4Sp-eK-c8f">
-                                        <rect key="frame" x="8" y="314" width="94" height="21"/>
+                                        <rect key="frame" x="264" y="213" width="94" height="21"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Flee" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LG3-KY-7DX">
-                                        <rect key="frame" x="299" y="213" width="77" height="25"/>
+                                        <rect key="frame" x="11" y="332" width="77" height="25"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Hunting range" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Oh5-iK-qQ7">
-                                        <rect key="frame" x="129" y="314" width="109" height="21"/>
+                                        <rect key="frame" x="252" y="256" width="109" height="21"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="M9t-Cs-QW9">
+                                        <rect key="frame" x="192" y="368" width="49" height="31"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <accessibility key="accessibilityConfiguration" identifier="showOnlyLeaderPredatorRingsSwitch"/>
+                                        <connections>
+                                            <action selector="showPredatorAlphaOnlySwitchChanged:" destination="BV1-FR-VrT" eventType="valueChanged" id="xN6-LZ-Sl0"/>
+                                        </connections>
+                                    </switch>
+                                    <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TWV-qA-pgV">
+                                        <rect key="frame" x="97" y="368" width="49" height="31"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <accessibility key="accessibilityConfiguration" identifier="showOnlyLeaderBoidRingsSwitch"/>
+                                        <connections>
+                                            <action selector="showBoidAlphaOnlySwitchChanged:" destination="BV1-FR-VrT" eventType="valueChanged" id="Hpd-88-maa"/>
+                                        </connections>
+                                    </switch>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Alpha only" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0pD-uv-1H7">
+                                        <rect key="frame" x="11" y="371" width="80" height="25"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Alpha only" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hKg-AP-Qef">
+                                        <rect key="frame" x="281" y="373" width="80" height="21"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tWs-UU-iDe" customClass="AccordionView" customModule="Flocking" customModuleProvider="target">
-                                        <rect key="frame" x="16" y="564" width="240" height="128"/>
+                                        <rect key="frame" x="2" y="426" width="359" height="55"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                     </view>
@@ -217,8 +265,10 @@
                     <connections>
                         <outlet property="AlignmentRing" destination="uPt-i6-e4k" id="H9z-Wq-0bR"/>
                         <outlet property="AvoidanceRing" destination="FC7-rj-cOn" id="yp9-Ug-oge"/>
+                        <outlet property="BoidAlphaOnly" destination="TWV-qA-pgV" id="GUG-vC-Bvv"/>
                         <outlet property="CohesionRing" destination="NYL-aF-AeD" id="AVk-SO-N4R"/>
                         <outlet property="FleeRing" destination="xYc-Gd-Cte" id="Cpc-dg-PSG"/>
+                        <outlet property="PredatorAlphaOnly" destination="M9t-Cs-QW9" id="N5v-rs-OHO"/>
                         <outlet property="playButton" destination="fs1-V1-d67" id="Zx3-WZ-nKL"/>
                         <outlet property="predatorHuntingRange" destination="sE3-9C-pBc" id="vEY-Tb-Oe8"/>
                         <outlet property="predatorVisualRange" destination="8IP-4O-Bbg" id="XMA-wE-xep"/>

@@ -17,6 +17,18 @@ class GameViewController: UIViewController,UIImagePickerControllerDelegate, UINa
     private var isSettingsPanelVisible = false
     private var isRunningSimulation = false
     
+    //Perception ring visability
+    //Boids
+    private var avoidanceRingVisible = true
+    private var alignmentRingVisible = true
+    private var cohesionRingVisible = true
+    private var fleeRingVisible = true
+    //Predators
+    private var predatorVisualRangeRingVisible = true
+    private var predatorHuntingRangeRingVisible = true
+
+    
+    
     
     //Outlets
     
@@ -45,9 +57,9 @@ class GameViewController: UIViewController,UIImagePickerControllerDelegate, UINa
     
     @IBOutlet weak var predatorHuntingRange: UISwitch!
     
+    @IBOutlet weak var BoidAlphaOnly: UISwitch!
     
-    
-    
+    @IBOutlet weak var PredatorAlphaOnly: UISwitch!
     
     
     
@@ -72,8 +84,18 @@ class GameViewController: UIViewController,UIImagePickerControllerDelegate, UINa
             view.showsNodeCount = true
         }
         setupLooks(in: self.view)
+        initializeSwitches()
     }
-    
+    func initializeSwitches() {
+        showBoidAlphaOnlySwitchChanged(BoidAlphaOnly) // Initialisera med aktuellt värde
+        showPredatorAlphaOnlySwitchChanged(PredatorAlphaOnly)
+        /*showAvoidancePerceptionRingSwitchChanged(avoidanceRingSwitch)
+        showAlignmentPerceptionRingSwitchChanged(alignmentRingSwitch)
+        showCohesionPerceptionRingSwitchChanged(cohesionRingSwitch)
+        showFleePerceptionRingSwitchChanged(fleeRingSwitch)
+        showPredatorVisualRangePerceptionRingSwitchChanged(predatorVisualRangeSwitch)
+        showPredatorHuntingRangePerceptionRingSwitchChanged(predatorHuntingRangeSwitch)*/
+    }
     private func setupLooks(in view: UIView) {
         
         //Settingspanel
@@ -179,6 +201,145 @@ class GameViewController: UIViewController,UIImagePickerControllerDelegate, UINa
             gameScene?.imageLayer.isHidden = true
         }
     }
+    
+    @IBAction func showBoidAlphaOnlySwitchChanged(_ sender: UISwitch) {
+        guard let boidsChildren = gameScene?.boidsLayer.children else {
+            return // Avsluta om det inte finns några barn i boidsLayer
+        }
+
+        // Loopa igenom alla boids
+        for (index, boidNode) in boidsChildren.enumerated() {
+            if let boidNode = boidNode as? SKShapeNode {
+                let isLeader = index == 0 // Om detta är ledarboiden
+
+                // Om showBoidAlphaOnly är på, visa bara ledarboidens ringar, annars visa alla
+                if sender.isOn {
+                    // Om vi visar bara ledaren, dölj alla ringar för andra boids
+                    boidNode.childNode(withName: "alignmentRing")?.isHidden = !isLeader || !alignmentRingVisible
+                    boidNode.childNode(withName: "avoidanceRing")?.isHidden = !isLeader || !avoidanceRingVisible
+                    boidNode.childNode(withName: "cohesionRing")?.isHidden = !isLeader || !cohesionRingVisible
+                    boidNode.childNode(withName: "fleeRing")?.isHidden = !isLeader || !fleeRingVisible
+                } else {
+                    // Annars, visa ringar för alla boids beroende på switcharnas status
+                    boidNode.childNode(withName: "alignmentRing")?.isHidden = !alignmentRingVisible
+                    boidNode.childNode(withName: "avoidanceRing")?.isHidden = !avoidanceRingVisible
+                    boidNode.childNode(withName: "cohesionRing")?.isHidden = !cohesionRingVisible
+                    boidNode.childNode(withName: "fleeRing")?.isHidden = !fleeRingVisible
+                }
+            }
+        }
+    }
+    
+    @IBAction func showPredatorAlphaOnlySwitchChanged(_ sender: UISwitch) {
+        guard let predatorsChildren = gameScene?.boidsLayer.children else {
+            return // Avsluta om det inte finns några barn i boidsLayer
+        }
+
+        // Loopa igenom alla predators
+        for (index, predatorNode) in predatorsChildren.enumerated() {
+            if let predatorNode = predatorNode as? SKShapeNode {
+                let isLeader = index == 0 // Om detta är ledarpredatorn
+
+                // Om showPredatorAlphaOnly är på, visa bara ledarpredatorns ringar, annars visa alla
+                if sender.isOn {
+                    // Visa bara ledarens ringar
+                    predatorNode.childNode(withName: "outerChaseRing")?.isHidden = !isLeader || !predatorVisualRangeRingVisible
+                    predatorNode.childNode(withName: "innerChaseRing")?.isHidden = !isLeader || !predatorHuntingRangeRingVisible
+                } else {
+                    // Visa ringar för alla predators beroende på switcharnas status
+                    predatorNode.childNode(withName: "outerChaseRing")?.isHidden = !predatorVisualRangeRingVisible
+                    predatorNode.childNode(withName: "innerChaseRing")?.isHidden = !predatorHuntingRangeRingVisible
+                }
+            }
+        }
+    }
+    
+    
+    @IBAction func showAvoidancePerceptionRingSwitchChanged(_ sender: UISwitch) {
+        avoidanceRingVisible = sender.isOn
+
+        guard let boidsChildren = gameScene?.boidsLayer.children else {
+            return // Avsluta om det inte finns några barn i boidsLayer
+        }
+
+        for boidNode in boidsChildren {
+            if let boidNode = boidNode as? SKShapeNode {
+                boidNode.childNode(withName: "avoidanceRing")?.isHidden = !avoidanceRingVisible
+            }
+        }
+    }
+
+    @IBAction func showAlignmentPerceptionRingSwitchChanged(_ sender: UISwitch) {
+        alignmentRingVisible = sender.isOn
+
+        guard let boidsChildren = gameScene?.boidsLayer.children else {
+            return // Avsluta om det inte finns några barn i boidsLayer
+        }
+
+        for boidNode in boidsChildren {
+            if let boidNode = boidNode as? SKShapeNode {
+                boidNode.childNode(withName: "alignmentRing")?.isHidden = !alignmentRingVisible
+            }
+        }
+    }
+
+    @IBAction func showCohesionPerceptionRingSwitchChanged(_ sender: UISwitch) {
+        cohesionRingVisible = sender.isOn
+
+        guard let boidsChildren = gameScene?.boidsLayer.children else {
+            return // Avsluta om det inte finns några barn i boidsLayer
+        }
+
+        for boidNode in boidsChildren {
+            if let boidNode = boidNode as? SKShapeNode {
+                boidNode.childNode(withName: "cohesionRing")?.isHidden = !cohesionRingVisible
+            }
+        }
+    }
+
+    @IBAction func showFleePerceptionRingSwitchChanged(_ sender: UISwitch) {
+        fleeRingVisible = sender.isOn
+
+        guard let boidsChildren = gameScene?.boidsLayer.children else {
+            return // Avsluta om det inte finns några barn i boidsLayer
+        }
+
+        for boidNode in boidsChildren {
+            if let boidNode = boidNode as? SKShapeNode {
+                boidNode.childNode(withName: "fleeRing")?.isHidden = !fleeRingVisible
+            }
+        }
+    }
+
+    @IBAction func showPredatorVisualRangePerceptionRingSwitchChanged(_ sender: UISwitch) {
+        predatorVisualRangeRingVisible = sender.isOn
+
+        guard let predatorsChildren = gameScene?.boidsLayer.children else {
+            return // Avsluta om det inte finns några barn i boidsLayer
+        }
+
+        for predatorNode in predatorsChildren {
+            if let predatorNode = predatorNode as? SKShapeNode {
+                predatorNode.childNode(withName: "outerChaseRing")?.isHidden = !predatorVisualRangeRingVisible
+            }
+        }
+    }
+
+    @IBAction func showPredatorHuntingRangePerceptionRingSwitchChanged(_ sender: UISwitch) {
+        predatorHuntingRangeRingVisible = sender.isOn
+
+        guard let predatorsChildren = gameScene?.boidsLayer.children else {
+            return // Avsluta om det inte finns några barn i boidsLayer
+        }
+
+        for predatorNode in predatorsChildren {
+            if let predatorNode = predatorNode as? SKShapeNode {
+                predatorNode.childNode(withName: "innerChaseRing")?.isHidden = !predatorHuntingRangeRingVisible
+            }
+        }
+    }
+    
+    
     
     
 }

@@ -67,9 +67,9 @@ struct PositionHistory {
     var color: SKColor
 }
 struct BoidsConfig {
-    var numberOfBoids = 600
-    var numberOfPredators = 3
-    var speedFactor: CGFloat = 1.0
+    var numberOfBoids = 112
+    var numberOfPredators = 1
+    var speedFactor: CGFloat = 1.2
     var doPaint: Bool = true
 
     var maxSpeed: CGFloat
@@ -138,6 +138,44 @@ struct BoidsConfig {
         self.predatorChaseRange = 150.0 * speedFactor
 
         self.driftPercentage = 0.1
+        
+        
+        
+        
+       /*
+        self.maxSpeed = 4.0 * speedFactor
+        self.avoidanceRange = 12.0 * speedFactor
+        self.alignmentRange = 28.0 * speedFactor
+        self.cohesionRange = 71.0 * speedFactor
+        self.fleeRange = 50.0 * speedFactor
+        self.edgeThreshold = 100.0 * speedFactor
+
+        // Justera faktorer försiktigt för att behålla dynamik
+        self.avoidanceFactor = 1.0 * sqrt(speedFactor)
+        self.alignmentFactor = 0.44 * sqrt(speedFactor)
+        self.cohesionFactor = 0.08 * sqrt(speedFactor)
+        self.fleeFactor = 1.3 * sqrt(speedFactor)
+        self.edgeAvoidanceFactor = 2.0
+
+        // Boidernas panikflykt
+        self.panicFlightSpeed = 4.0 * speedFactor
+        self.panicFlightRange = 30.0 * speedFactor
+        self.panicFlightWeight = 3.0
+
+        // Predator parametrar
+        self.predatorSpeed = 2.5 * speedFactor
+        self.predatorTurnSpeed = 2.0 * speedFactor
+        self.predatorVisualRange = 100.0 * speedFactor
+        self.predatorHuntingRange = 25.0 * speedFactor
+        self.predatorModerateSpeed = 1.5 * speedFactor
+        self.predatorAggressiveSpeed = 3.0 * speedFactor
+        self.predatorDriftFactor = 0.1 // Håll denna konstant
+
+        // Övrigt
+        self.driftPercentage = 0.1 // Håll denna konstant
+        
+        */
+        
 
         // Debugging settings
         self.showAlignmentRange = true
@@ -214,6 +252,7 @@ class BoidFlocking {
             var steering = alignment * config.alignmentFactor +
                            separation * config.avoidanceFactor +
                            cohesion * config.cohesionFactor +
+        randomDrift +
                            flee * config.fleeFactor
 
             // Applicera kantvändningslogik precis innan uppdatering av hastighet och position

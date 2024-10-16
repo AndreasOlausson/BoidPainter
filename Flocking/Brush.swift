@@ -18,24 +18,24 @@ class BrushManager {
         print(iterationCount)
         let normalizedIterationCount = iterationCount
         switch normalizedIterationCount {
-        case 0...200:
-            return Brush(
-                strokeSize: 25,
-                glowSize: 5,
-                antiAliasing: true,
-                opacity: 0.05
-            )
-        case 201...400:
+        case 0...12000:
             return Brush(
                 strokeSize: 10,
-                glowSize: 4,
+                glowSize: 25,
                 antiAliasing: true,
                 opacity: 0.1
             )
-        case 401...600:
+        case 12001...20000:
             return Brush(
-                strokeSize: 5,
-                glowSize: 3,
+                strokeSize: 6,
+                glowSize: 15,
+                antiAliasing: true,
+                opacity: 0.1
+            )
+        case 20001...60000:
+            return Brush(
+                strokeSize: 3,
+                glowSize: 8,
                 antiAliasing: true,
                 opacity: 0.2
             )
@@ -44,7 +44,7 @@ class BrushManager {
                 strokeSize: 1,
                 glowSize: 1,
                 antiAliasing: true,
-                opacity: 1
+                opacity: 0.4
             )
         }
     }
